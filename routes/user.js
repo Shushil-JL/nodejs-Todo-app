@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllUsers, getMyProfile, login, register } from '../controllers/user.js'
+import { deleteUser, getAllUsers, getMyProfile, login, logout, register } from '../controllers/user.js'
 import { isAuthenticated } from '../middlewares/auth.js'
 
 const router = express.Router()
@@ -8,9 +8,13 @@ router.get("/all", getAllUsers)
 
 router.post("/register", register)
 router.post("/login", login)
+router.get("/logout",isAuthenticated,logout)
 
 router.get("/me",isAuthenticated,getMyProfile)
 
+
+router.get("/all",getAllUsers)
+router.delete("/user/:id",isAuthenticated,deleteUser)
 // router.get("/special",specialfunc)
 
 // router.get("/:id",findUserbyId)
