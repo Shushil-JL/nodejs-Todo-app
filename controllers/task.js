@@ -1,7 +1,8 @@
+import errorHandler from "../middlewares/error.js"
 import { Task } from "../models/task.js"
 
 
-export const newTask = async (req, res) => {
+export const newTask = async (req, res, next) => {
     try {
         const { title, description } = req.body
         await Task.create({
@@ -16,43 +17,34 @@ export const newTask = async (req, res) => {
         })
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        })
+        next(error)
     }
 
 }
-export const getMyTask = async (req, res) => {
+export const getMyTask = async (req, res, next) => {
     try {
         const tasks = await Task.find({ user: req.user._id })
-        if (!tasks) return res.status(404).json({
-            success: false,
-            message: "You have not added any task yet"
-        })
+        if (!tasks) return next(new errorHandler("You have not added any tasks yet!", 404))
+
 
         res.status(200).json({
             success: true,
             tasks,
         })
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        })
+        next(error)
 
     }
 }
 
 
 
-export const updateTask = async (req, res) => {
+export const updateTask = async (req, res, next) => {
     try {
         const task = await Task.findById(req.params.id)
-        if (!task) return res.status(404).json({
-            success: false,
-            message: "Task not Available"
-        })
+
+        if (!task) return next(new errorHandler("Task not Availbale", 404))
+
         task.isCompleted = !task.isCompleted
         await task.save()
         res.status(200).json({
@@ -62,21 +54,15 @@ export const updateTask = async (req, res) => {
 
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        })
+        next(error)
     }
 
 }
 
-export const deleteTask = async (req, res) => {
+export const deleteTask = async (req, res, next) => {
     try {
         const task = await Task.findById(req.params.id)
-        if (!task) return res.status(404).json({
-            success: false,
-            message: "Task not Available"
-        })
+        if (!task) return next(new errorHandler("No Task Availbale", 404))
 
 
         await task.deleteOne()
@@ -87,10 +73,7 @@ export const deleteTask = async (req, res) => {
 
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        })
+        next(error)
     }
 
 }
